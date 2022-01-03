@@ -1,0 +1,64 @@
+gobackn.c: In function ‘gbn_server’:
+gobackn.c:56:10: error: implicit declaration of function ‘server_socket’ [-Werror=implicit-function-declaration]
+   56 |   sock = server_socket(&server);
+      |          ^~~~~~~~~~~~~
+gobackn.c:68:30: error: passing argument 1 of ‘wait_on_input’ makes integer from pointer without a cast [-Werror=int-conversion]
+   68 |     can_read = wait_on_input(&read_set, &timeout);
+      |                              ^~~~~~~~~
+      |                              |
+      |                              fd_set *
+gobackn.c:31:23: note: expected ‘int’ but argument is of type ‘fd_set *’
+   31 | int wait_on_input(int sock, struct timeval* timeout);
+      |                   ~~~~^~~~
+gobackn.c:81:9: error: implicit declaration of function ‘write_file_chunk’; did you mean ‘read_file_chunk’? [-Werror=implicit-function-declaration]
+   81 |         write_file_chunk(data, header.nbytes, fp);
+      |         ^~~~~~~~~~~~~~~~
+      |         read_file_chunk
+gobackn.c:83:9: error: implicit declaration of function ‘makeACK’ [-Werror=implicit-function-declaration]
+   83 |         makeACK(packet, nextseq);
+      |         ^~~~~~~
+gobackn.c:99:3: error: implicit declaration of function ‘server_shutdown’ [-Werror=implicit-function-declaration]
+   99 |   server_shutdown(sock, &client, nextseq);
+      |   ^~~~~~~~~~~~~~~
+gobackn.c: In function ‘gbn_client’:
+gobackn.c:140:11: error: implicit declaration of function ‘makeFIN’ [-Werror=implicit-function-declaration]
+  140 |           makeFIN(packets[head], nextseq);
+      |           ^~~~~~~
+gobackn.c:155:7: error: implicit declaration of function ‘gettimeofday’ [-Werror=implicit-function-declaration]
+  155 |       gettimeofday(&send_times[current], NULL);
+      |       ^~~~~~~~~~~~
+gobackn.c:191:17: error: implicit declaration of function ‘isValidFIN’; did you mean ‘isValidSeq’? [-Werror=implicit-function-declaration]
+  191 |       } else if(isValidFIN(&header, base_seq, nextseq))
+      |                 ^~~~~~~~~~
+      |                 isValidSeq
+gobackn.c: In function ‘wait_on_input’:
+gobackn.c:228:33: error: incompatible type for argument 2 of ‘select’
+  228 |   can_read = select(FD_SETSIZE, read_set, NULL, NULL, timeout);
+      |                                 ^~~~~~~~
+      |                                 |
+      |                                 fd_set
+In file included from /usr/include/sys/types.h:179,
+                 from /usr/include/stdlib.h:394,
+                 from gobackn.h:11,
+                 from gobackn.c:1:
+/usr/include/sys/select.h:101:51: note: expected ‘fd_set * restrict’ but argument is of type ‘fd_set’
+  101 | extern int select (int __nfds, fd_set *__restrict __readfds,
+      |                                ~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+gobackn.c: In function ‘isValidSeq’:
+gobackn.c:248:5: error: type of ‘seq’ defaults to ‘int’ [-Werror=implicit-int]
+  248 | int isValidSeq(seq, base_seq, nextseq){
+      |     ^~~~~~~~~~
+gobackn.c:248:5: error: type of ‘base_seq’ defaults to ‘int’ [-Werror=implicit-int]
+gobackn.c:248:5: error: type of ‘nextseq’ defaults to ‘int’ [-Werror=implicit-int]
+gobackn.c:253:30: error: suggest parentheses around ‘&&’ within ‘||’ [-Werror=parentheses]
+  253 |     return (seq >= base_seq) && (seq < (WINMAX + 1)) ||
+      |            ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+gobackn.c: In function ‘get_avg_rtt’:
+gobackn.c:266:23: error: variable ‘rtt’ set but not used [-Werror=unused-but-set-variable]
+  266 |   struct timeval now, rtt;
+      |                       ^~~
+gobackn.c:265:7: error: unused variable ‘alpha’ [-Werror=unused-variable]
+  265 |   int alpha = .125;
+      |       ^~~~~
+cc1: all warnings being treated as errors
+make: *** [Makefile:23: .build/gobackn.o] Error 1

@@ -1,0 +1,33 @@
+Jack McShane (jamcshan)
+Networks Lab 01 SMTP
+
+--------------------------------------------------------------
+
+jamcshan@silo:~$ nc mail-relay.iu.edu 25
+220 Sendmail ESMTP - IU Campus Communications Team - Mail-Relay
+HELO silo.luddy.indiana.edu
+250 mail-relay.iu.edu Hello silo.luddy.indiana.edu [129.79.247.195], pleased to meet you
+MAIL From:<jamcshan@iu.edu>
+250 2.1.0 <jamcshan@iu.edu>... Sender ok
+RCPT To:<sice-networks-l@list.indiana.edu>
+250 2.1.5 <sice-networks-l@list.indiana.edu>... Recipient ok
+DATA
+354 Enter mail, end with "." on a line by itself
+Subject: Jack McShane Assignment 01 SMTP
+.
+250 2.0.0 189NW9pZ006729 Message accepted for delivery
+QUIT
+221 2.0.0 mail-relay.iu.edu closing connection
+QUIT
+
+--------------------------------------------------------------
+
+
+1. What happens when you try to send to a non-IU email address? Why?
+* When I try to send an email to a non-IU email address, the request is denied
+  because I do not have the proper authentication.
+2. What happens when you use a made-up from address? Why?
+* When I use a made up address from which to send an email, the email goes
+    through nonetheless. I would think that you would not want that to work
+    generally speaking. But it was mentioned during the discussion session that
+    SMTP does not check to see wheter an email address is valid or not.

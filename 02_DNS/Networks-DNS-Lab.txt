@@ -1,0 +1,180 @@
+﻿Jack McShane (jamcshan)
+CSCI Networks
+Lab 02 DNS
+
+
+
+
+1. Load balancing refers to distributing incoming network traffic across multiple compute resources. How can DNS be used to load balance services? Give a concrete explanation for google.com
+   1. DNS can be used to perform load balancing thanks to two aspects of how it operates: that it allows multiple (replicated) servers to have the same alias and that when returning an RR, it shuffles the order in which the IP addresses are returned. These aspects of DNS allow a company such as Google to load balance service requests by replicating the google.com server several times and registering their IP addresses with the DNS system. When multiple requests are then made to the website, DNS returns a different server’s IP to each request (for as many replicated servers as there are). This stops a single server from having to handle the entirety of the request volume and allows multiple servers to split the volume of requests evenly.
+2. DNS has been around since 1985 and the core protocol is still being used today. What is the inherent weakness of DNS (as of RFC1035; excluding DNSSEC)? Give an example of how an attacker might utilize it.
+   1. The inherent weakness of the DNS system is the DDoS attack wherein an attacker uses multiple zombie hosts to send a large volume of requests to a root DNS server, consuming all of its ability to service requests and effectively denying service to all other traffic. This was a particularly poignant attack when there were only 13 root servers, but now that the root servers have been replicated so much, it is probably far less of a concern at this point.
+3. Perform a manual iterative DNS query for mail-relay.iu.edu with dig starting from the root servers. List all commands and their outputs and explain why you issued every command. Do not use tracing features (dig +trace) for your final write-down.
+* The commands and their corresponding terminal outputs can be found at the bottom of the page!
+   1. Dig . : I issued this first command to find the hostnames/IP of a DNS root server.
+   2. Dig @a.root-servers.net edu. : I used this command to query the ‘a’ root server for the top-level domain (TLD) edu servers.
+   3. Dig @b.edu-servers.net iu.edu. : With this command I queried the ‘b’ TLD edu server for a server that is authoritative of the iu.edu domain
+   4. Dig @dns1.iu.edu mail-relay.iu.edu. : With this command I queried the first of the iu.edu authoritative DNS servers for the mail-relay.iu.edu domain and its IP address.  With this address, I can now (theoretically) open a direct line of communication over some transport layer protocol.
+4. You are sitting in a coffee shop and are connected to a public WLAN. You fire up wireshark and start sniffing the traffic of other customers. You notice that all of their traffic is over https so you cannot simply read it. You also notice something striking about the DNS traffic, what is it and what are the implications?
+   1. You would notice that almost all of the DNS traffic only queries the ISPs local DNS server as most information for the requested sites is already cached there.
+5. Suppose that IU has an internal DNS cache. You are an ordinary user (no network admin). Can you determine (and if yes, how) if a given external website was recently accessed?
+   1. Given that the dig command and wireshark packet sniffer are out of the picture, the only way I might suggest is potentially measuring the response time of the page you want against a page that you can safely say has not been cached ( a xx.fr site for example ), but that would ignore other sources of potential latency aside.dig .
+
+
+
+
+; <<>> DiG 9.16.20 <<>> .
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 3618
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;.				IN	A
+
+;; AUTHORITY SECTION:
+.			3978	IN	SOA	a.root-servers.net. nstld.verisign-grs.com. 2021091702 1800 900 604800 86400
+
+;; Query time: 59 msec
+;; SERVER: 192.168.1.254#53(192.168.1.254)
+;; WHEN: Fri Sep 17 23:51:43 CDT 2021
+;; MSG SIZE  rcvd: 103
+
+
+------------------------------------------------------------------------------
+dig @a.root-servers.net edu.
+
+; <<>> DiG 9.16.20 <<>> @a.root-servers.net edu.
+; (2 servers found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 47328
+;; flags: qr rd; QUERY: 1, ANSWER: 0, AUTHORITY: 13, ADDITIONAL: 27
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;edu.				IN	A
+
+;; AUTHORITY SECTION:
+edu.			172800	IN	NS	b.edu-servers.net.
+edu.			172800	IN	NS	f.edu-servers.net.
+edu.			172800	IN	NS	i.edu-servers.net.
+edu.			172800	IN	NS	a.edu-servers.net.
+edu.			172800	IN	NS	g.edu-servers.net.
+edu.			172800	IN	NS	j.edu-servers.net.
+edu.			172800	IN	NS	k.edu-servers.net.
+edu.			172800	IN	NS	m.edu-servers.net.
+edu.			172800	IN	NS	l.edu-servers.net.
+edu.			172800	IN	NS	h.edu-servers.net.
+edu.			172800	IN	NS	c.edu-servers.net.
+edu.			172800	IN	NS	e.edu-servers.net.
+edu.			172800	IN	NS	d.edu-servers.net.
+
+;; ADDITIONAL SECTION:
+b.edu-servers.net.	172800	IN	A	192.33.14.30
+b.edu-servers.net.	172800	IN	AAAA	2001:503:231d::2:30
+f.edu-servers.net.	172800	IN	A	192.35.51.30
+f.edu-servers.net.	172800	IN	AAAA	2001:503:d414::30
+i.edu-servers.net.	172800	IN	A	192.43.172.30
+i.edu-servers.net.	172800	IN	AAAA	2001:503:39c1::30
+a.edu-servers.net.	172800	IN	A	192.5.6.30
+a.edu-servers.net.	172800	IN	AAAA	2001:503:a83e::2:30
+g.edu-servers.net.	172800	IN	A	192.42.93.30
+g.edu-servers.net.	172800	IN	AAAA	2001:503:eea3::30
+j.edu-servers.net.	172800	IN	A	192.48.79.30
+j.edu-servers.net.	172800	IN	AAAA	2001:502:7094::30
+k.edu-servers.net.	172800	IN	A	192.52.178.30
+k.edu-servers.net.	172800	IN	AAAA	2001:503:d2d::30
+m.edu-servers.net.	172800	IN	A	192.55.83.30
+m.edu-servers.net.	172800	IN	AAAA	2001:501:b1f9::30
+l.edu-servers.net.	172800	IN	A	192.41.162.30
+l.edu-servers.net.	172800	IN	AAAA	2001:500:d937::30
+h.edu-servers.net.	172800	IN	A	192.54.112.30
+h.edu-servers.net.	172800	IN	AAAA	2001:502:8cc::30
+c.edu-servers.net.	172800	IN	A	192.26.92.30
+c.edu-servers.net.	172800	IN	AAAA	2001:503:83eb::30
+e.edu-servers.net.	172800	IN	A	192.12.94.30
+e.edu-servers.net.	172800	IN	AAAA	2001:502:1ca1::30
+d.edu-servers.net.	172800	IN	A	192.31.80.30
+d.edu-servers.net.	172800	IN	AAAA	2001:500:856e::30
+
+;; Query time: 50 msec
+;; SERVER: 2001:503:ba3e::2:30#53(2001:503:ba3e::2:30)
+;; WHEN: Fri Sep 17 23:52:42 CDT 2021
+;; MSG SIZE  rcvd: 827
+
+------------------------------------------------------------------------------
+dig @b.edu-servers.net iu.edu.
+
+; <<>> DiG 9.16.20 <<>> @b.edu-servers.net iu.edu.
+; (2 servers found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 41845
+;; flags: qr rd; QUERY: 1, ANSWER: 0, AUTHORITY: 3, ADDITIONAL: 6
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;iu.edu.				IN	A
+
+;; AUTHORITY SECTION:
+iu.edu.			172800	IN	NS	dns1.iu.edu.
+iu.edu.			172800	IN	NS	dns2.iu.edu.
+iu.edu.			172800	IN	NS	dns3.iu.edu.
+
+;; ADDITIONAL SECTION:
+dns1.iu.edu.		172800	IN	A	134.68.220.8
+dns1.iu.edu.		172800	IN	AAAA	2001:18e8:3:220::10
+dns2.iu.edu.		172800	IN	A	129.79.1.8
+dns2.iu.edu.		172800	IN	AAAA	2001:18e8:2:8::10
+dns3.iu.edu.		172800	IN	A	52.23.85.80
+
+;; Query time: 199 msec
+;; SERVER: 2001:503:231d::2:30#53(2001:503:231d::2:30)
+;; WHEN: Sat Sep 18 00:02:16 CDT 2021
+;; MSG SIZE  rcvd: 196
+
+------------------------------------------------------------------------------
+dig @dns1.iu.edu mail-relay.iu.edu
+
+; <<>> DiG 9.16.20 <<>> @dns1.iu.edu mail-relay.iu.edu
+; (2 servers found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 24812
+;; flags: qr aa rd; QUERY: 1, ANSWER: 2, AUTHORITY: 3, ADDITIONAL: 6
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+; COOKIE: cb8acb2c4ccdefb77c77ea016145651eef6e3d7816875663 (good)
+;; QUESTION SECTION:
+;mail-relay.iu.edu.		IN	A
+
+;; ANSWER SECTION:
+mail-relay.iu.edu.	300	IN	A	129.79.1.63
+mail-relay.iu.edu.	300	IN	A	134.68.220.21
+
+;; AUTHORITY SECTION:
+iu.edu.			3600	IN	NS	dns2.iu.edu.
+iu.edu.			3600	IN	NS	dns1.iu.edu.
+iu.edu.			3600	IN	NS	dns3.iu.edu.
+
+;; ADDITIONAL SECTION:
+dns1.iu.edu.		3600	IN	A	134.68.220.8
+dns2.iu.edu.		3600	IN	A	129.79.1.8
+dns3.iu.edu.		3600	IN	A	52.23.85.80
+dns1.iu.edu.		3600	IN	AAAA	2001:18e8:3:220::10
+dns2.iu.edu.		3600	IN	AAAA	2001:18e8:2:8::10
+
+;; Query time: 40 msec
+;; SERVER: 2001:18e8:3:220::10#53(2001:18e8:3:220::10)
+;; WHEN: Sat Sep 18 00:04:08 CDT 2021
+;; MSG SIZE  rcvd: 267
+
